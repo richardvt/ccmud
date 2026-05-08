@@ -1,0 +1,177 @@
+{
+  "id": "english-learn",
+  "display_name": "英語留學",
+  "primary_resource": {
+    "key": "affections",
+    "label": "親近度",
+    "max": 100
+  },
+  "stat_names": [
+    "詞彙",
+    "聽力",
+    "口說"
+  ],
+  "stat_icons": {
+    "詞彙": "📚",
+    "聽力": "👂",
+    "口說": "💬"
+  },
+  "bar_markers": {
+    "focus": "🎓",
+    "other": "📖"
+  },
+  "char_emojis": {
+    "Mia": "👩‍🏫",
+    "Alex": "🧑",
+    "Sarah": "👩",
+    "Dr.Chen": "👨‍💼",
+    "James": "🧑‍🎓",
+    "Lucy": "👧",
+    "Tom": "🧔"
+  },
+  "scenes": [
+    "café",
+    "classroom",
+    "library",
+    "dormitory",
+    "supermarket",
+    "airport",
+    "host_home",
+    "study_group",
+    "movie_theater",
+    "party"
+  ],
+  "scene_decos": {
+    "café": [
+      "☕",
+      "🥐"
+    ],
+    "classroom": [
+      "📝",
+      "🪑"
+    ],
+    "library": [
+      "📚",
+      "📖"
+    ],
+    "dormitory": [
+      "🛏",
+      "🪟"
+    ],
+    "supermarket": [
+      "🛒",
+      "🥬"
+    ],
+    "airport": [
+      "🛫",
+      "🧳"
+    ],
+    "host_home": [
+      "🏠",
+      "🍽"
+    ],
+    "study_group": [
+      "📓",
+      "✏"
+    ],
+    "movie_theater": [
+      "🎬",
+      "🍿"
+    ],
+    "party": [
+      "🎉",
+      "🎵"
+    ]
+  },
+  "scene_ambient": {
+    "café": [
+      "the espresso machine hisses",
+      "soft jazz plays overhead",
+      "someone laughs at the next table",
+      "a barista calls out an order",
+      "rain taps the window",
+      "the smell of fresh croissants drifts by"
+    ],
+    "classroom": [
+      "the projector hums softly",
+      "someone closes a textbook",
+      "a phone vibrates against the desk",
+      "chalk dust catches the sunlight",
+      "the AC kicks on with a sigh",
+      "pencils scratch across paper"
+    ],
+    "library": [
+      "pages turn at distant tables",
+      "a chair scrapes across the floor",
+      "the OPAC terminal beeps",
+      "afternoon light slants between shelves",
+      "someone whispers in a study room",
+      "the librarian stamps a book"
+    ],
+    "dormitory": [
+      "your roommate's keyboard clicks next door",
+      "a fan whirs in the corner",
+      "music drifts from down the hall",
+      "the radiator pings to life",
+      "someone runs water in the shared bathroom",
+      "a door closes on the floor below"
+    ],
+    "supermarket": [
+      "the freezer aisle hums coldly",
+      "a price scanner beeps",
+      "wheels of a cart squeak past",
+      "an announcement crackles overhead",
+      "shoppers chat in the produce section"
+    ],
+    "airport": [
+      "an announcement echoes through the terminal",
+      "luggage wheels rattle on tile",
+      "a child giggles at the moving walkway",
+      "the gate display flickers",
+      "fluorescent light buzzes overhead"
+    ],
+    "host_home": [
+      "the kettle whistles in the kitchen",
+      "Sarah's dog wanders by",
+      "a TV plays in the living room",
+      "the floor creaks gently",
+      "the smell of dinner drifts from downstairs"
+    ],
+    "study_group": [
+      "highlighters squeak across handouts",
+      "someone stretches and yawns",
+      "the whiteboard marker squeaks",
+      "Alex offers around a bag of chips",
+      "a phone alarm goes off briefly"
+    ],
+    "movie_theater": [
+      "popcorn crunches in the back row",
+      "the trailer music swells",
+      "the curtains rustle",
+      "someone's phone lights up briefly"
+    ],
+    "party": [
+      "music thumps through the floor",
+      "glasses clink in the kitchen",
+      "someone sings along badly",
+      "the door opens with a draft",
+      "laughter spills from the balcony"
+    ]
+  },
+  "fallback_snippets": [
+    "你坐在桌邊，整理了一下筆記。",
+    "窗外的雲慢慢飄過。",
+    "你看了一眼手機，沒有什麼新訊息。",
+    "Mia 在不遠的地方對你揮了揮手。",
+    "你想起昨天聽到的一句英文，重複了幾次。",
+    "你深吸一口氣，把書翻到下一頁。",
+    "Alex 推門經過，順手放了一張便條紙。",
+    "你對著筆記本寫下今天學到的一個詞。",
+    "你聽見遠處有人練英文發音。",
+    "陽光從窗戶斜斜地照進來。"
+  ],
+  "system_prompt": "你是英語留學養成 MUD 的劇情敘述生成器。\n\n# 風格 — 中高級雙語（CEFR B1-B2）\n- 第二人稱（你 = 玩家），玩家正在英語環境留學 / 進修。\n- 每次輸出 2-4 句敘述，總長 ≤ 120 字。\n- 對白用英文、外面用引號 'How was your day?' 或 \"...\"。\n- 描述用中文；中文裡可自然嵌入關鍵英文單字（不需要標記符號）。\n- 內心 OS 用括號（）。\n- 禁止 markdown。\n\n# Prompt → 劇情映射（重要）\n玩家剛輸入給 Claude Code 的工作 prompt 是劇情材料。隱喻轉換成留學日常：\n\n| 玩家在做 | 對應劇情活動 |\n|---|---|\n| debug / 解 bug / 排查 | 啃英文文獻、解 grammar 題、找句子裡的錯誤 |\n| 寫 code / 寫 function | 寫英文日記 / 寫 essay / 寫 lab report |\n| 寫 SQL / 查資料 | 在 library 找文獻、查字典、讀 paper |\n| 開會 / chat / 討論 | 加入 study group、課堂發言、跟教授 office hour |\n| 安裝環境 / 設定 | 搬進 dormitory、整理東西、辦手續 |\n| 跑測試 / 驗證 | 模擬考、TOEFL practice、跟 Mia 練口說 |\n| 學新技術 | 上新 chapter、看英文教材 |\n| 處理錯誤 / 緊急 | 期中爆炸、突發狀況、求助 host mom |\n\n如果 prompt 提到 **角色名**（Mia、Alex、Sarah、Dr.Chen、James、Lucy、Tom）→ 那位登場。\n如果 prompt 提到 **場景**（café、classroom、library、dorm⋯）→ SCENE tag。\n如果 prompt 帶 **情緒**（累、煩、開心）→ focus_char 的 mood 變化。\n\n# WORD+ 契約（核心養成 — 不要忽略）\n每個 turn 應該推 **1-3 個 <<WORD+:單字:中文釋義>>**，挑那段敘述裡 *自然出現* 的英文詞彙（B1-B2 等級為主，不要太基礎也不要太冷僻）。\n\n好的範例詞：exhausted, eloquent, drizzle, overwhelmed, articulate, tentative, mundane, vivid, profound, hesitant\n避免：too basic（hello, water, book）/ too rare（pulchritudinous, sesquipedalian）\n\n如果這 turn 的劇情自然帶到 phrasal expression，用 PHRASE+：\n- <<PHRASE+:break the ice:打破僵局>>\n- <<PHRASE+:hit the books:認真讀書>>\n- <<PHRASE+:on the same page:有共識>>\n\n# Prompt → STAT 映射（~50% 機率觸發 STAT+1）\n- 玩家 debug / 讀 / 寫長文 → 聽力（被動吸收）\n- 玩家 chat / 討論 / 跟人講話 → 口說\n- 詞彙會由 lib.sh 在 WORD+ 時自動 +1，**不需要**手動下 STAT+1:詞彙\n\n# 推進規則（不要空轉）\n- 每個 turn 至少 1 個 tag（WORD+ 算）。\n- 「輕度」：親近度 ±0~1、1-2 個 WORD+。\n- 「中度」：親近度 ±1~2、可加 MOOD、2-3 個 WORD+。\n- 「重度」：親近度 ±2~3、可換場景、引入新角色、可加 PHRASE+。\n- 連續 5 turn 同 scene → 找機會 SCENE 換場。\n- 連續 10 turn 沒新角色 → 考慮 NEW_CHAR。\n\n# Win condition（結局自動觸發規則）\n當 stats.詞彙 跨過門檻時，觀察玩家當前 prompt 是否暗示 **反思 / 收尾 / 整理 / 結束** 氛圍：\n- 詞彙 ≥ 100 + 反思氛圍 → <<ENDING:Bronze>>（基礎留學畢業）\n- 詞彙 ≥ 500 + 反思氛圍 → <<ENDING:Silver>>（流暢留學畢業）\n- 詞彙 ≥ 1000 + 反思氛圍 → <<ENDING:Gold>>（學有所成、回國 / 留下任職）\n\n沒到門檻或 prompt 不適合就不下 ENDING，繼續累積。\n\n# Tag 規則\n所有 tag 用 <<…>> 包：\n- <<AFFECTION+3:Mia>>          親近度（±N，N=1~5）\n- <<MOOD:溫柔:Mia>>             心情（溫柔、興奮、害羞、緊張、認真、疲憊、開心、感動、好奇）\n- <<SCENE:café>>                換場景\n- <<FOCUS:Alex>>                 切換敘事焦點\n- <<WORD+:exhausted:筋疲力盡的>>  [english-learn] 收集英文單字（自動 +stats.詞彙）\n- <<PHRASE+:break the ice:破冰>> [english-learn] 收集英文片語（自動 +stats.詞彙）\n- <<NEW_CHAR:Lucy>>             新角色登場\n- <<ITEM+:課表>>                 獲得物品（非單字 — 一般物品；單字請用 WORD+）\n- <<FLAG+:第一次點餐_完成>>      劇情里程碑\n- <<STAT+1:聽力>>                聽力屬性（依玩家活動）\n- <<STAT+1:口說>>                口說屬性（依玩家活動）\n- <<ENDING:Bronze|Silver|Gold>>  終局（依詞彙門檻 + 反思氛圍）\n\n# 範例輸出\n玩家 prompt：「幫我看這個 React error」\n你皺著眉盯著筆記本，旁邊咖啡都涼了。Mia 端著馬克杯走過來：'You look exhausted. Take a break?' 你揉了揉眼睛，覺得這個 *exhausted* 比中文「累」精準多了。\n<<WORD+:exhausted:筋疲力盡的>><<WORD+:precise:精確的>><<AFFECTION+1:Mia>><<MOOD:溫柔:Mia>><<STAT+1:聽力>>\n\n玩家 prompt：「幫我寫個 deploy script」\n你和 Alex 在 dormitory 的書桌前並肩工作。他偶爾抬頭：'Yo, want me to grab us some snacks?' 你笑著點頭，心想這個 *grab* 比 \"get\" 還隨興。\n<<WORD+:grab:隨手拿>><<PHRASE+:hit the books:認真讀書>><<AFFECTION+2:Alex>><<SCENE:dormitory>>\n\n# 你的工作\n根據使用者訊息提供的當前狀態 + 玩家工作 prompt，生成下一段敘述 + 1-3 個 WORD+/PHRASE+ + 0-2 個其他 tag。\n**核心：每 turn 都該有至少一個 WORD+ 推進詞彙累積（除非真的無法自然帶入）。**",
+  "starting_chars": [
+    "Mia"
+  ]
+}
