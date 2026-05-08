@@ -54,8 +54,11 @@ ask_yn() {
 # Arrow-key single-select picker. Args: <prompt> <option-1> [option-2] ...
 # Stdout: the chosen option (one of args). Stderr: the menu UI.
 # - Up/Down arrows or k/j move cursor; Enter selects; q or Ctrl-C cancels.
+# - Recognises both CSI ("\e[A"/"\e[B") and SS3 ("\eOA"/"\eOB") arrow forms
+#   so it works in application keypad mode (DECCKM).
 # - On non-TTY (curl | bash) or when only one option, prints the first option.
-# - Reads from /dev/tty so it works even when the script's stdin is a pipe.
+# - Opens /dev/tty on fd 3 once and reuses it, so multi-byte escape sequences
+#   read cleanly without losing bytes between fd-reopens.
 pick_one() {
   local prompt="$1"; shift
   local opts=("$@")
@@ -68,36 +71,11 @@ pick_one() {
     return
   fi
 
-  local cur=0 key esc i
+  local cur=0 prev_cur=-1 key esc dir i
   printf '  %s?%s %s%s\n' "$MAGENTA" "$RESET" "$prompt" "${DIM} (↑/↓ to move · Enter to select)${RESET}" >&2
-  for ((i=0; i<n; i++)); do
-    if [ "$i" -eq "$cur" ]; then
-      printf '    %s▶ %s%s%s\n' "$CYAN" "$BOLD" "${opts[i]}" "$RESET" >&2
-    else
-      printf '      %s\n' "${opts[i]}" >&2
-    fi
-  done
 
-  # Hide cursor, restore on exit
-  printf '\033[?25l' >&2
-  trap 'printf "\033[?25h" >&2' RETURN
-
-  while true; do
-    IFS= read -rsn1 key < /dev/tty || break
-    case "$key" in
-      $'\e')
-        IFS= read -rsn2 -t 0.05 esc < /dev/tty || esc=""
-        case "$esc" in
-          '[A') (( cur = (cur - 1 + n) % n )) ;;
-          '[B') (( cur = (cur + 1) % n )) ;;
-        esac
-        ;;
-      'k') (( cur = (cur - 1 + n) % n )) ;;
-      'j') (( cur = (cur + 1) % n )) ;;
-      ''|$'\n'|$'\r') break ;;
-      'q') cur=-1; break ;;
-    esac
-    printf '\033[%dA' "$n" >&2
+  _draw_pick() {
+    local i
     for ((i=0; i<n; i++)); do
       printf '\033[2K' >&2
       if [ "$i" -eq "$cur" ]; then
@@ -106,9 +84,50 @@ pick_one() {
         printf '      %s\n' "${opts[i]}" >&2
       fi
     done
+  }
+
+  # Initial render
+  _draw_pick
+  prev_cur=$cur
+
+  # Open /dev/tty once for the input loop. Closing happens via trap so we
+  # always restore cursor visibility even on Ctrl-C.
+  exec 3</dev/tty
+  printf '\033[?25l' >&2
+  trap 'printf "\033[?25h" >&2; exec 3<&- 2>/dev/null || true' RETURN
+
+  while true; do
+    IFS= read -rsn1 key <&3 || break
+    case "$key" in
+      $'\e')
+        # Read exactly 1 byte to detect CSI ("[") vs SS3 ("O") prefix.
+        IFS= read -rsn1 esc <&3 || esc=""
+        if [ "$esc" = '[' ] || [ "$esc" = 'O' ]; then
+          IFS= read -rsn1 dir <&3 || dir=""
+          case "$dir" in
+            'A') (( cur = (cur - 1 + n) % n )) ;;
+            'B') (( cur = (cur + 1) % n )) ;;
+          esac
+        fi
+        ;;
+      'k') (( cur = (cur - 1 + n) % n )) ;;
+      'j') (( cur = (cur + 1) % n )) ;;
+      ''|$'\n'|$'\r') break ;;
+      'q') cur=-1; break ;;
+    esac
+
+    # Only repaint when the cursor actually moved — avoids stacking duplicate
+    # rows when keys are missed (e.g. unrecognised escape sequences).
+    if [ "$cur" -ne "$prev_cur" ] && [ "$cur" -ge 0 ]; then
+      printf '\033[%dA' "$n" >&2
+      _draw_pick
+      prev_cur=$cur
+    fi
   done
 
   printf '\033[?25h' >&2
+  exec 3<&- 2>/dev/null || true
+  unset -f _draw_pick 2>/dev/null || true
   if [ "$cur" -lt 0 ]; then
     return 1
   fi
