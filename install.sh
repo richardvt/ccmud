@@ -59,6 +59,10 @@ ask_yn() {
 # - On non-TTY (curl | bash) or when only one option, prints the first option.
 # - Opens /dev/tty on fd 3 once and reuses it, so multi-byte escape sequences
 #   read cleanly without losing bytes between fd-reopens.
+# - Uses arithmetic-substitution (`cur=$(( … ))`) instead of `(( cur = … ))`
+#   because the latter returns exit-code 1 when the result is 0, which can
+#   trip `set -e` chains in unexpected ways.
+# - Cursor movement goes through tput (with ANSI fallback) for portability.
 pick_one() {
   local prompt="$1"; shift
   local opts=("$@")
@@ -71,63 +75,68 @@ pick_one() {
     return
   fi
 
+  # Cursor / line-clear escapes — prefer tput, fall back to raw ANSI.
+  local cuu_n el civis cnorm
+  cuu_n=$(tput cuu "$n" 2>/dev/null) || cuu_n=$'\e['"${n}"'A'
+  el=$(tput el 2>/dev/null) || el=$'\e[2K'
+  civis=$(tput civis 2>/dev/null) || civis=$'\e[?25l'
+  cnorm=$(tput cnorm 2>/dev/null) || cnorm=$'\e[?25h'
+
   local cur=0 prev_cur=-1 key esc dir i
   printf '  %s?%s %s%s\n' "$MAGENTA" "$RESET" "$prompt" "${DIM} (↑/↓ to move · Enter to select)${RESET}" >&2
 
-  _draw_pick() {
-    local i
-    for ((i=0; i<n; i++)); do
-      printf '\033[2K' >&2
-      if [ "$i" -eq "$cur" ]; then
-        printf '    %s▶ %s%s%s\n' "$CYAN" "$BOLD" "${opts[i]}" "$RESET" >&2
-      else
-        printf '      %s\n' "${opts[i]}" >&2
-      fi
-    done
-  }
-
-  # Initial render
-  _draw_pick
+  # Initial render — same loop body is repeated below, intentionally inline
+  # instead of a nested helper to avoid any dynamic-scoping surprises across
+  # bash versions.
+  for ((i=0; i<n; i++)); do
+    if [ "$i" -eq "$cur" ]; then
+      printf '    %s▶ %s%s%s\n' "$CYAN" "$BOLD" "${opts[i]}" "$RESET" >&2
+    else
+      printf '      %s\n' "${opts[i]}" >&2
+    fi
+  done
   prev_cur=$cur
 
-  # Open /dev/tty once for the input loop. Closing happens via trap so we
-  # always restore cursor visibility even on Ctrl-C.
   exec 3</dev/tty
-  printf '\033[?25l' >&2
-  trap 'printf "\033[?25h" >&2; exec 3<&- 2>/dev/null || true' RETURN
+  printf '%s' "$civis" >&2
+  # shellcheck disable=SC2064  # we want $cnorm expanded now
+  trap "printf '%s' '${cnorm//\'/\'\\\'\'}' >&2; exec 3<&- 2>/dev/null || true" RETURN
 
   while true; do
     IFS= read -rsn1 key <&3 || break
     case "$key" in
       $'\e')
-        # Read exactly 1 byte to detect CSI ("[") vs SS3 ("O") prefix.
         IFS= read -rsn1 esc <&3 || esc=""
         if [ "$esc" = '[' ] || [ "$esc" = 'O' ]; then
           IFS= read -rsn1 dir <&3 || dir=""
           case "$dir" in
-            'A') (( cur = (cur - 1 + n) % n )) ;;
-            'B') (( cur = (cur + 1) % n )) ;;
+            'A') cur=$(( (cur - 1 + n) % n )) ;;
+            'B') cur=$(( (cur + 1) % n )) ;;
           esac
         fi
         ;;
-      'k') (( cur = (cur - 1 + n) % n )) ;;
-      'j') (( cur = (cur + 1) % n )) ;;
+      'k') cur=$(( (cur - 1 + n) % n )) ;;
+      'j') cur=$(( (cur + 1) % n )) ;;
       ''|$'\n'|$'\r') break ;;
       'q') cur=-1; break ;;
     esac
 
-    # Only repaint when the cursor actually moved — avoids stacking duplicate
-    # rows when keys are missed (e.g. unrecognised escape sequences).
     if [ "$cur" -ne "$prev_cur" ] && [ "$cur" -ge 0 ]; then
-      printf '\033[%dA' "$n" >&2
-      _draw_pick
+      printf '%s' "$cuu_n" >&2
+      for ((i=0; i<n; i++)); do
+        printf '%s' "$el" >&2
+        if [ "$i" -eq "$cur" ]; then
+          printf '    %s▶ %s%s%s\n' "$CYAN" "$BOLD" "${opts[i]}" "$RESET" >&2
+        else
+          printf '      %s\n' "${opts[i]}" >&2
+        fi
+      done
       prev_cur=$cur
     fi
   done
 
-  printf '\033[?25h' >&2
+  printf '%s' "$cnorm" >&2
   exec 3<&- 2>/dev/null || true
-  unset -f _draw_pick 2>/dev/null || true
   if [ "$cur" -lt 0 ]; then
     return 1
   fi
