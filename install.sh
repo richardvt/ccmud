@@ -282,7 +282,7 @@ if [ ! -f "$SETTINGS" ]; then
   echo '{}' > "$SETTINGS"
 fi
 
-# Detect existing ccpet statusLine — both can't share status line directly.
+# Detect existing statusLine — only one tool can own the slot at a time.
 EXISTING_SL=$(jq -r '.statusLine.command // ""' "$SETTINGS" 2>/dev/null || echo "")
 TAKE_STATUSLINE=1
 if [ -n "$EXISTING_SL" ] && ! [[ "$EXISTING_SL" == *"$MUD_DIR/mud.sh"* ]]; then

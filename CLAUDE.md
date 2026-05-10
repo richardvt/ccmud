@@ -33,9 +33,9 @@ The repo is the *source*; the *runtime* lives at `~/.claude/mud/`. `install.sh` 
 
 `mud.sh update` curls the latest `mud.sh` from GitHub (`richardvt/ccmud@main`; override with `CCMUD_UPDATE_URL`) and replaces the installed script in place. It does *not* touch state, usage log, or settings.
 
-`install.sh`'s settings-merge is matched-by-command and only replaces the ccmud's own entries, so other tools' hooks (e.g. ccpet) on `UserPromptSubmit` / `Stop` are kept.
+`install.sh`'s settings-merge is matched-by-command and only replaces ccmud's own entries, so other tools' hooks on `UserPromptSubmit` / `Stop` are kept.
 
-**Coexistence with ccpet**: only one renderer can hold the `statusLine` at a time. `install.sh` detects an existing statusLine and asks before replacing; UserPromptSubmit and Stop arrays append (both tools' hooks fire).
+**Coexistence with other statusLine tools**: only one renderer can hold the `statusLine` at a time. `install.sh` detects an existing statusLine and asks before replacing; UserPromptSubmit and Stop arrays append (both tools' hooks fire).
 
 ## Architecture of `mud.sh`
 

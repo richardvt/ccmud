@@ -47,7 +47,7 @@ The installer is interactive — **arrow keys** (↑/↓) + Enter, no typing req
 - Detect existing save and ask if you want to keep it
 - List bundled genres and let you pick one
 - Copy `mud.sh` + all `genres/*.json` + `*.lib.sh` + `prompts/` to `~/.claude/mud/`
-- Merge ccmud's `statusLine` + `UserPromptSubmit` + `Stop` hooks into `~/.claude/settings.json` (asks before replacing an existing statusLine like ccpet)
+- Merge ccmud's `statusLine` + `UserPromptSubmit` + `Stop` hooks into `~/.claude/settings.json` (asks before replacing any existing statusLine)
 - Install a `/mud` slash command for in-Claude-Code state inspection
 - Render a sample LCD at the end
 
@@ -180,9 +180,9 @@ Hook entry points (Claude Code 自動呼叫，不要手動)：`feed-prompt` / `f
 
 完全清光：`rm -rf ~/.claude/mud/`。
 
-## Coexistence with ccpet
+## Coexistence with other statusLine tools
 
-ccpet 是另一個 Claude Code statusLine 寵物工具，跟 ccmud 都想佔 statusLine。`install.sh` 偵測到既有 statusLine 會詢問再覆寫。`UserPromptSubmit` / `Stop` hooks 是 append（兩邊都會 fire）。Hook 之間有 `CCMUD_INTERNAL` env var guard 防止子 claude session 觸發遞迴。
+只有一個 statusLine 槽位。`install.sh` 偵測到既有 statusLine 會詢問再覆寫。`UserPromptSubmit` / `Stop` hooks 用 append 合併（兩邊都會 fire）。Hook 之間有 `CCMUD_INTERNAL` env var guard 防止子 claude session 觸發遞迴。
 
 ## License
 
