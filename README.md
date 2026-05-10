@@ -2,7 +2,7 @@
 
 A prompt-driven text MUD that lives in your Claude Code status line. Every prompt you send to Claude advances one game turn — a background `claude -p --model haiku` reads your work prompt, transforms it metaphorically into in-fiction activity, and writes the next 2-4 sentences of story plus typed events (好感+N、捕獲新寶可夢、收集英文單字⋯) which appear in the LCD frame above your status bar.
 
-![ccmud demo](docs/demo.gif)
+![ccmud demo — pokemon](docs/demo-pokemon.gif)
 
 ```
 ╭── 📍 café · Day 4 · Turn 36 ─────────╮
@@ -24,6 +24,14 @@ A prompt-driven text MUD that lives in your Claude Code status line. Every promp
 | `english-learn` | 英語留學 | 留學日常 | 親近度 0-100 | 詞彙 / 聽力 / 口說 |
 
 切換完全無損：`mud.sh set-genre <id>` 自動 snapshot 當前進度，下次切回去完整還原。每個 genre 都有獨立存檔。
+
+### dating-sim — 戀愛養成
+
+![dating-sim demo](docs/demo-dating-sim.gif)
+
+### english-learn — 英語留學
+
+![english-learn demo](docs/demo-english-learn.gif)
 
 ## Install
 
