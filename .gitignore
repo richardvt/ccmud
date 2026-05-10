@@ -1,0 +1,9 @@
+.DS_Store
+
+# Local runtime artifacts (in case mud.sh is run from inside the repo)
+state.json
+saves/
+usage.log
+story.log
+*.last_prompt
+*.next.txt

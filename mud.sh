@@ -1169,7 +1169,7 @@ fork_haiku_generation() {
 當前狀態：$state_summary
 玩家剛輸入給 Claude Code 的工作 prompt（截斷至 800 字）：
 """$user_prompt"""
-玩家活動強度：$intensity（依 token 用量推斷）
+玩家活動強度：${intensity}（依 token 用量推斷）
 
 請依照 system 規則，輸出下一段 2–4 句中文敘述 + 0–3 個行內 tag。只輸出純文字，不要 markdown。
 EOF
