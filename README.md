@@ -2,6 +2,8 @@
 
 A prompt-driven text MUD that lives in your Claude Code status line. Every prompt you send to Claude advances one game turn — a background `claude -p --model haiku` reads your work prompt, transforms it metaphorically into in-fiction activity, and writes the next 2-4 sentences of story plus typed events (好感+N、捕獲新寶可夢、收集英文單字⋯) which appear in the LCD frame above your status bar.
 
+![ccmud demo](docs/demo.gif)
+
 ```
 ╭── 📍 café · Day 4 · Turn 36 ─────────╮
 │ +2 💕 Mia                            │  🎓 Mia ━━━─────── 22 · 溫柔
