@@ -166,7 +166,14 @@ Hook entry points (Claude Code 自動呼叫，不要手動)：`feed-prompt` / `f
 
 ## Cost & privacy
 
-- 每個 turn = 一次 Haiku 呼叫（~500 input + ~200 output token），透過你已登入的 `claude` CLI session，**計入你的 quota**。`mud.sh usage` 看每日累計。
+**Cost — 訂閱用戶基本無感，連 Pro 都夠用。**
+
+- 每個 turn 是**一次 Haiku 4.5 呼叫**（Anthropic 最便宜、最快的模型，比 Sonnet 大約便宜一個量級），平均 ~500 input + ~200 output token。
+- 走的是你**已登入的 `claude` CLI session** — **不需要 API key、不需要 credit card**，直接吃你的 **Claude Pro / Max 訂閱**額度。沒訂閱也能跑（Free tier），但日打 prompt 量大會比較快撞限制。
+- 量感：日常用 Claude Code 一天打 50-200 個 prompt → ccmud 累計 ~35K-140K Haiku token。跟你同一天 Sonnet / Opus 寫 code 的開銷比幾乎可以忽略。`mud.sh usage` 看每日累計數字。
+
+**Privacy：**
+
 - 你的 prompt body 截前 800 字會傳給背景 Haiku（劇情驅動材料）。要關掉：刪 `cmd_feed_prompt` 裡寫 `.last_prompt` 那行，或定期 `rm $TMPDIR/ccmud/*.last_prompt`。
 - `state.json` / `story.log` / `usage.log` 都在本機 `~/.claude/mud/`，不外傳。
 
