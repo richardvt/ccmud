@@ -4,16 +4,13 @@ A prompt-driven text MUD that lives in your Claude Code status line. Every promp
 
 ![ccmud demo — pokemon](docs/demo-pokemon.gif)
 
-```
-╭── 📍 café · Day 4 · Turn 36 ─────────╮
-│ +2 💕 Mia                            │  🎓 Mia ━━━─────── 22 · 溫柔
-│ 📖 drizzle — 細雨                    │  📚 詞彙 47  👂 聽力 12  💬 口說 8
-│ 📖 overwhelmed — 不知所措的          │  你皺著眉盯著筆記本，旁邊咖啡都涼了。
-│ ✿ break the ice — 打破僵局          │  Mia 端著馬克杯走過來：'You look
-│ 雪奈：感動                           │  exhausted. Take a break?' 你揉了揉眼
-│ +1 📈 聽力                           │  睛，這個 *exhausted* 比中文「累」精準
-╰──────────────────────────────────────╯  🧠 31% │ ⏱ 5h 55% │ 📅 7d 49%
-```
+### dating-sim — 戀愛養成
+
+![dating-sim demo](docs/demo-dating-sim.gif)
+
+### english-learn — 英語留學
+
+![english-learn demo](docs/demo-english-learn.gif)
 
 ## Genres bundled
 
@@ -24,14 +21,6 @@ A prompt-driven text MUD that lives in your Claude Code status line. Every promp
 | `english-learn` | 英語留學 | 留學日常 | 親近度 0-100 | 詞彙 / 聽力 / 口說 |
 
 切換完全無損：`mud.sh set-genre <id>` 自動 snapshot 當前進度，下次切回去完整還原。每個 genre 都有獨立存檔。
-
-### dating-sim — 戀愛養成
-
-![dating-sim demo](docs/demo-dating-sim.gif)
-
-### english-learn — 英語留學
-
-![english-learn demo](docs/demo-english-learn.gif)
 
 ## Install
 
