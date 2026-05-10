@@ -1404,11 +1404,11 @@ cmd_uninstall() {
   printf '  • Remove ccmud hooks from %s\n' "$settings"
   printf '  • Remove statusLine if it is ccmud (otherwise leave it alone)\n'
   printf '  • Delete %s/mud.sh and %s/genres/* and %s/prompts/*\n' "$MUD_DIR" "$MUD_DIR" "$MUD_DIR"
-  printf '  • Delete %s/saves/ (all per-genre snapshots)\n' "$MUD_DIR"
   printf 'Will KEEP (in case you reinstall):\n'
   printf '  • %s (current save)\n' "$STATE_FILE"
   printf '  • %s (story log)\n' "$STORY_LOG"
   printf '  • %s (token usage)\n' "$USAGE_LOG"
+  printf '  • %s/saves/ (per-genre snapshots — your accumulated runs)\n' "$MUD_DIR"
   printf '\nProceed? [y/N] '
   local reply=""
   read -r reply
@@ -1432,10 +1432,10 @@ cmd_uninstall() {
   fi
 
   rm -f "$MUD_DIR/mud.sh"
-  rm -rf "$MUD_DIR/genres" "$MUD_DIR/prompts" "$MUD_DIR/saves"
+  rm -rf "$MUD_DIR/genres" "$MUD_DIR/prompts"
   rm -f "$HOME/.claude/commands/mud.md"
-  printf '✓ binaries + genres + prompts + saves + /mud command deleted\n'
-  printf '\nRetained (for next install): %s, %s, %s\n' "$STATE_FILE" "$STORY_LOG" "$USAGE_LOG"
+  printf '✓ binaries + genres + prompts + /mud command deleted\n'
+  printf '\nRetained (for next install): %s, %s, %s, %s/saves/\n' "$STATE_FILE" "$STORY_LOG" "$USAGE_LOG" "$MUD_DIR"
   printf '↻ Restart Claude Code so it stops calling the removed hooks.\n'
 }
 

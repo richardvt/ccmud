@@ -73,8 +73,8 @@ Each `<id>.json` in this directory defines a pluggable genre. Drop one in, run `
 5. Test with `mud.sh preview` (renders LCD with current state) and a manual Stop simulation:
    ```bash
    echo '{"session_id":"test"}' | mud.sh feed-stop
-   sleep 10                    # let Haiku finish
-   ls -la /tmp/ccmud/test.next.txt
+   sleep 10                                 # let Haiku finish
+   ls -la "$TMPDIR/ccmud/test.<id>.next.txt"  # macOS uses $TMPDIR, not /tmp
    echo '{"session_id":"test"}' | mud.sh feed-stop   # drains it
    mud.sh stats | jq '.last_narrative, .narrative_source'
    ```
