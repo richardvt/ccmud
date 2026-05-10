@@ -1,26 +1,36 @@
 # ccmud
 
-A prompt-driven text MUD that lives in your Claude Code status line. Every prompt you send to Claude advances one game turn — a background `claude -p --model haiku` reads your work prompt, transforms it metaphorically into in-fiction activity, and writes the next 2-4 sentences of story plus typed events (好感+N、捕獲新寶可夢、收集英文單字⋯) which appear in the LCD frame above your status bar.
+> Documentation primarily in 繁中. English README PRs welcome.
+
+A prompt-driven text MUD that lives in your Claude Code status line. **Every prompt you send to Claude — debugging, writing code, opening PRs — secretly advances a story you're starring in.**
+
+A background `claude -p --model haiku` reads your work prompt, transforms it metaphorically into in-fiction activity (debug → 念書、寫 code → 練字、開會 → 課堂討論), and writes the next 2-4 sentences plus typed events (好感+N、捕獲新寶可夢、收集英文單字⋯) that appear in the LCD frame above your status bar.
+
+## Demos
 
 ### pokemon — 寶可夢冒險
 
 ![pokemon demo](docs/demo-pokemon.gif)
 
-### dating-sim — 戀愛養成
+<details>
+<summary><b>dating-sim</b> — 戀愛養成（點開看）</summary>
 
 ![dating-sim demo](docs/demo-dating-sim.gif)
+</details>
 
-### english-learn — 英語留學
+<details>
+<summary><b>english-learn</b> — 英語留學（點開看）</summary>
 
 ![english-learn demo](docs/demo-english-learn.gif)
+</details>
 
 ## Genres bundled
 
-| id | 中文 | 主題 | 主資源 | 玩家屬性 |
-|---|---|---|---|---|
-| `dating-sim` | 戀愛養成 | 校園戀愛 | 角色好感 0-100 | 智慧 / 魅力 / 體力 |
-| `pokemon` | 寶可夢冒險 | 寶可夢訓練家 | 寶可夢等級 | 徽章 / 金錢 / 里程 |
-| `english-learn` | 英語留學 | 留學日常 | 親近度 0-100 | 詞彙 / 聽力 / 口說 |
+| id | 主題 | 主資源 | 玩家屬性 |
+|---|---|---|---|
+| `dating-sim` | 校園戀愛 | 角色好感 0-100 | 智慧 / 魅力 / 體力 |
+| `pokemon` | 寶可夢訓練家 | 寶可夢等級 | 徽章 / 金錢 / 里程 |
+| `english-learn` | 留學日常 | 親近度 0-100 | 詞彙 / 聽力 / 口說 |
 
 切換完全無損：`mud.sh set-genre <id>` 自動 snapshot 當前進度，下次切回去完整還原。每個 genre 都有獨立存檔。
 
@@ -68,7 +78,7 @@ Claude 結束 → Stop hook → mud.sh feed-stop
        └ 寫到 <sid>.<genre>.next.txt（給下個 Stop hook drain）
 ```
 
-**重要：drain 永遠晚一個 turn。** 你 prompt 第一次後等 60-180s，再 prompt 一次才會看到上一輪的劇情顯示出來。
+**重要：劇情比你慢一回合。** 第一次打 prompt 看不到劇情變化（Haiku 還在背景寫，~60-180s）；下一個 prompt 觸發時，才會看到剛剛那一輪的劇情顯示出來。
 
 ## Prompt → 劇情映射
 
@@ -172,7 +182,7 @@ Hook entry points (Claude Code 自動呼叫，不要手動)：`feed-prompt` / `f
 
 ## Coexistence with ccpet
 
-兩個工具都想佔 statusLine。`install.sh` 偵測到既有 statusLine 會詢問再覆寫。`UserPromptSubmit` / `Stop` hooks 是 append（兩邊都會 fire）。Hook 之間有 `CCMUD_INTERNAL` env var guard 防止子 claude session 觸發遞迴。
+ccpet 是另一個 Claude Code statusLine 寵物工具，跟 ccmud 都想佔 statusLine。`install.sh` 偵測到既有 statusLine 會詢問再覆寫。`UserPromptSubmit` / `Stop` hooks 是 append（兩邊都會 fire）。Hook 之間有 `CCMUD_INTERNAL` env var guard 防止子 claude session 觸發遞迴。
 
 ## License
 
