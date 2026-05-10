@@ -77,7 +77,7 @@ Render dims fallback narratives (`\033[2;36m` vs `\033[36m` for Haiku output) so
 
 ## Conventions
 
-- All state mutations go through `acquire_lock` / `sload` / `persist_state` — don't read or write `state.json` directly except in `cmd_hatch` (which intentionally clobbers everything) and `cmd_debug_set`.
+- All state mutations go through `acquire_lock` / `sload` / `persist_state` — don't read or write `state.json` directly except in `cmd_hatch` (snapshots cross-genre then clobbers `state.json`), `cmd_set_genre` (snapshots + restores or builds fresh defaults), and `cmd_debug_set`.
 - `DIRTY=0` short-circuits `persist_state`; only set `DIRTY=1` when an `MD_*` var actually changed.
 - Nested objects/arrays (`affections`, `moods`, `flags`, `inventory`, `stats`, `active_chars`) live as JSON strings in `MD_*_json` vars and are mutated via `jq -c …` — one extra `jq` call per tag is fine; tags fire only on Stop hook drain.
 - Heredoc-quote inline awk/jq programs (`'…'`) — bash variables inside them won't expand.

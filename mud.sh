@@ -1255,9 +1255,23 @@ cmd_hatch() {
     exit 1
   fi
   acquire_lock
+  # Snapshot the existing state to saves/<old_genre>.json before clobber, but
+  # only when hatching into a different genre. Same-genre hatch is interpreted
+  # as "wipe and restart this genre" and intentionally does not snapshot
+  # (would otherwise overwrite the prior snapshot of that genre).
+  local snapshot_msg=""
+  if [ -f "$STATE_FILE" ]; then
+    local old_genre
+    old_genre=$("$JQ" -r '.genre // ""' "$STATE_FILE" 2>/dev/null || echo "")
+    if [ -n "$old_genre" ] && [ "$old_genre" != "$genre" ]; then
+      mkdir -p "$SAVES_DIR"
+      cp "$STATE_FILE" "$SAVES_DIR/$old_genre.json"
+      snapshot_msg=" (snapshotted $old_genre to saves/$old_genre.json)"
+    fi
+  fi
   default_state "$name" "$genre" > "$STATE_FILE"
   release_lock
-  printf '🌸 %s 開始了 %s 的故事\n' "$name" "$genre"
+  printf '🌸 %s 開始了 %s 的故事%s\n' "$name" "$genre" "$snapshot_msg"
 }
 
 cmd_set_genre() {
@@ -1291,13 +1305,21 @@ cmd_set_genre() {
     release_lock
     printf '🎭 genre %s → %s (restored from saves/%s.json)\n' "$old" "$genre" "$genre"
   else
-    # No save for the new genre yet — carry over current state, rebrand.
-    MD_genre="$genre"
-    DIRTY=1
-    persist_state
+    # No save for the new genre yet — build fresh state from the new genre's
+    # defaults (genre-specific scene + starting char, empty affections/moods/
+    # flags/inventory/stats/events), but preserve cross-genre progression:
+    # player_name, turn, day, started_at, last_interaction. Avoids the
+    # "dating-sim genre but pokemon characters/scene/stats" Frankenstein.
+    default_state "$MD_player_name" "$genre" \
+      | "$JQ" --argjson turn "${MD_turn:-0}" \
+              --argjson day "${MD_day:-1}" \
+              --argjson started "${MD_started_at:-0}" \
+              --argjson last_int "${MD_last_interaction:-0}" \
+              '.turn = $turn | .day = $day | .started_at = $started | .last_interaction = $last_int' \
+      | swrite
     release_lock
-    printf '🎭 genre %s → %s (state carried over; %s snapshot saved to saves/%s.json)\n' \
-      "$old" "$genre" "$old" "$old"
+    printf '🎭 genre %s → %s (fresh start with %s defaults, kept turn/day/player_name; %s snapshot saved to saves/%s.json)\n' \
+      "$old" "$genre" "$genre" "$old" "$old"
   fi
 }
 
