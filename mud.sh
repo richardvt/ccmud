@@ -137,7 +137,7 @@ sload() {
       (.day // 1),
       (.scene // ""),
       (.focus_char // ""),
-      (.last_narrative // ""),
+      ((.last_narrative // "") | gsub("[\\n\\r]+"; " ")),
       (.narrative_source // "seed"),
       (.session_id // ""),
       (.last_haiku_at // 0),
@@ -147,6 +147,14 @@ sload() {
       (.ending // "")
     ] | map(tostring) | join("")
   ' "$STATE_FILE")
+  # Defense-in-depth: even if a field contains a newline (older saves predate
+  # drain_narrative_file's collapse, or a future field type allows multi-line),
+  # read -r would terminate at the first \n and leave subsequent variables
+  # blank — including MD_last_interaction, which would then default to 0 on
+  # the next persist and trip apply_decay's neglect threshold. Collapse so
+  # read-based field splitting always sees one line.
+  raw=${raw//$'\n'/ }
+  raw=${raw//$'\r'/ }
   IFS=$'\x1f' read -r \
     MD_genre MD_player_name MD_started_at MD_turn MD_day \
     MD_scene MD_focus_char MD_last_narrative MD_narrative_source \
@@ -446,6 +454,12 @@ drain_narrative_file() {
   tags=$(printf '%s' "$raw" | grep -oE '<<[^>]+>>' || true)
   clean=$(printf '%s' "$raw" | sed -E 's/<<[^>]+>>//g')
   clean=$(printf '%s' "$clean" | awk 'NF { print } !NF { next }' | tr -d '\r')
+  # Collapse internal newlines + whitespace runs into single spaces. Critical:
+  # multi-line last_narrative breaks sload's \x1f-separated read on the next
+  # call (read -r terminates at the first newline, blanking every field after
+  # last_narrative — including last_interaction, which then defaults to 0 on
+  # the next persist and triggers a phantom "neglect" death).
+  clean=$(printf '%s' "$clean" | tr '\n' ' ' | sed -E 's/[[:space:]]+/ /g')
   clean=$(printf '%s' "$clean" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')
 
   # Refusal guard: if zero tags AND text looks like a meta/refusal reply,
