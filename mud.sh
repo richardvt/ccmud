@@ -1104,8 +1104,10 @@ cmd_feed_stop() {
 
   # Fire background haiku for the next turn (no-op if dead or no-genre).
   if [ "$MD_alive" = "true" ] && [ -n "$GENRE_FILE" ] && [ -n "$sid" ]; then
-    fork_haiku_generation "$sid" "$tin" "$tout" "$tcc" "$tcr" &
-    disown 2>/dev/null || true
+    # Subshell + stdio detach so the bg haiku is reparented to init and
+    # the hook's pgroup wait returns immediately (instead of stalling
+    # until the 15s timeout while claude -p churns).
+    ( fork_haiku_generation "$sid" "$tin" "$tout" "$tcc" "$tcr" </dev/null >/dev/null 2>&1 & )
   fi
 }
 
