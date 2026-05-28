@@ -118,7 +118,11 @@ default_state() {
 
 ensure_state() {
   mkdir -p "$MUD_DIR" "$TMPDIR_MUD"
-  if [ ! -f "$STATE_FILE" ]; then
+  # -s = exists AND size > 0. A 0-byte state.json (left by a botched swrite
+  # in an older build, or by an interrupted write) would otherwise pass an
+  # `-f` check, feed empty input to sload, and start a write-empty death
+  # loop where every persist_state clobbers state.json with another 0 bytes.
+  if [ ! -s "$STATE_FILE" ]; then
     default_state > "$STATE_FILE"
   fi
 }
@@ -172,12 +176,37 @@ sload() {
 swrite() {
   local tmp="$STATE_FILE.tmp.$$"
   cat > "$tmp"
+  # Guard against clobbering state.json with garbage. If the upstream jq
+  # call in persist_state failed (e.g. one --argjson got an empty/invalid
+  # MD_*_json), cat receives 0 bytes and would otherwise mv that over the
+  # live state — bricking the panel until manual recovery.
+  if [ ! -s "$tmp" ] || ! "$JQ" -e . "$tmp" >/dev/null 2>&1; then
+    printf '[ccmud] swrite: refusing to overwrite state.json with empty/invalid JSON\n' >&2
+    rm -f "$tmp"
+    return 1
+  fi
   mv "$tmp" "$STATE_FILE"
 }
 
 DIRTY=0
 persist_state() {
   [ "$DIRTY" -eq 0 ] && return
+  # Defensive defaults for the *_json vars: jq --argjson rejects empty
+  # strings ("Bad JSON in --argjson"), and a single missing default makes
+  # the whole persist_state jq exit non-zero with no stdout — then swrite
+  # used to write that 0-byte output over state.json. Now swrite also
+  # guards, but keeping these here means a legitimately-empty container
+  # round-trips correctly instead of just being refused at write time.
+  # Use explicit if-test rather than ${var:=default} — bash parameter
+  # expansion treats `}` inside the default as the closing brace, so
+  # `${x:={}}` doesn't expand the way you'd expect.
+  [ -z "$MD_active_chars_json" ] && MD_active_chars_json='[]'
+  [ -z "$MD_affections_json" ]   && MD_affections_json='{}'
+  [ -z "$MD_moods_json" ]        && MD_moods_json='{}'
+  [ -z "$MD_flags_json" ]        && MD_flags_json='[]'
+  [ -z "$MD_inventory_json" ]    && MD_inventory_json='[]'
+  [ -z "$MD_stats_json" ]        && MD_stats_json='{}'
+  [ -z "$MD_events_json" ]       && MD_events_json='[]'
   local end_arg="null"
   if [ -n "$MD_ending" ] && [ "$MD_ending" != "null" ]; then
     end_arg=$("$JQ" -n --arg v "$MD_ending" '$v')
